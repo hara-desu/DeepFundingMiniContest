@@ -147,11 +147,11 @@ def transitivity_check(y_pred, df_pred):
             (transitivity_df['transitivity'] == 'violated')
     ]
 
-    print(
-        f'''Number of transitive inconsistencies or unchecked cases: {unchecked_violated_df.shape[0]}''',
-        f'''\n{'-'*130}\nDataframe transitive inconsistencies:\n{'-'*130}\n''',
-        unchecked_violated_df,
-        f'''\n{'-'*130}'''
-    )
-
-    return transitivity_df
+    if unchecked_violated_df.shape[0] == 0:
+        print("Number of transitive inconsistencies or unchecked cases: 0")
+    else:
+        print(
+            f'''Number of transitive inconsistencies or unchecked cases: {unchecked_violated_df.shape[0]}''',
+            f'''\n{'-'*130}\nDataframe with transitive inconsistencies:\n{'-'*130}\n'''
+        )
+        return transitivity_df
