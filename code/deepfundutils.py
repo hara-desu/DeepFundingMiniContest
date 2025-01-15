@@ -215,3 +215,31 @@ def get_github_readme(url_arr):
         descriptions[i] = modified_tuple
 
     return descriptions
+
+
+"""
+Makes triplets for consistency_check function.
+
+Input:
+    - pred_df(pd.DataFrame): id, pred columns
+    - df_train(pd.DataFrame): df used to train model
+
+Output:
+    - triplets: triplets = [(0,1,5), (1,2,3), (0,2,8)]
+
+"""
+def make_triplets(pred_df, df_train):
+    pred_df['pred_b'] = 1 - pred_df['pred']
+    pred_df = pred_df.rename(columns={"pred": "pred_a"})
+    pred_df['diff'] = pred_df['pred_a'] - pred_df['pred_b']
+
+    df = pd.merge(
+        pred_df[['id', 'diff']],
+        df_train[['id', 'project_a', 'project_b']],
+        on='id', how='left'
+    )
+
+    label_encode_ab('project_a', 'project_b', df)
+    df = df.drop(columns={'id', })
+    triplets = [(row[1][1], row[1][2], row[1][0]) for row in df.iterrows()]
+    return triplets
