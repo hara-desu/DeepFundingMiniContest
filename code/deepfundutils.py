@@ -1,5 +1,5 @@
 '''
-Utils for working with model predictions and evaluating model output.
+Utils for working with data, model predictions and evaluating model output.
 
 requirements:
     - pandas
@@ -11,6 +11,7 @@ import warnings
 import pandas as pd
 import numpy as np
 from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.preprocessing import LabelEncoder
 
 
 """
