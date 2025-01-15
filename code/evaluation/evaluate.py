@@ -67,10 +67,6 @@ def fix_pred_range(y_pred):
 """
 Checks violations of transitive consistency rule.
 
-Returns:
-    - number transitive inconsistencies
-    - dataframe with transitive inconsistencies
-
 Input:
     - y_pred: pandas dataframe consisting of two columns: id, pred
 
@@ -81,6 +77,10 @@ Input:
     13  0.12345678901
 
     - df_pred: pandas dataframe used to train the model that produced y_pred
+
+Output:
+    - number transitive inconsistencies
+    - dataframe with transitive inconsistencies
 """
 def transitivity_check(y_pred, df_pred):
 
@@ -155,3 +155,24 @@ def transitivity_check(y_pred, df_pred):
             f'''\n{'-'*130}\nDataframe with transitive inconsistencies:\n{'-'*130}\n'''
         )
         return transitivity_df
+
+
+"""
+Encodes both column a and b as labels
+
+Input:
+    - column_a(str): column name for project a
+    - column_b(str): column name for project b
+    - df(pd.DataFrame): dataframe where need to label values
+"""
+def label_encode_ab(column_a, column_b, df):
+    ab_column = pd.concat([df[f'{column_a}'], df[f'{column_b}']]).unique()
+
+    label_encoder = LabelEncoder()
+
+    ab_labels = label_encoder.fit_transform(ab_column)
+
+    mapping = dict(zip(ab_column, ab_labels))
+
+    df[f'{column_a}'] = df[f'{column_a}'].map(mapping)
+    df[f'{column_b}'] = df[f'{column_b}'].map(mapping)
