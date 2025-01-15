@@ -12,6 +12,9 @@ import pandas as pd
 import numpy as np
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.preprocessing import LabelEncoder
+import requests
+from markdown_it import MarkdownIt
+from bs4 import BeautifulSoup
 
 
 """
@@ -177,3 +180,38 @@ def label_encode_ab(column_a, column_b, df):
 
     df[f'{column_a}'] = df[f'{column_a}'].map(mapping)
     df[f'{column_b}'] = df[f'{column_b}'].map(mapping)
+
+
+"""
+Function to fetch README content from a GitHub repository by url.
+
+Input:
+    - url_arr(array): an array with github repository urls
+
+Output:
+    - list of tuples [(url, description)] with README content
+"""
+def get_github_readme(url_arr):
+    parser = MarkdownIt()
+
+    def fetch(url):
+        try:
+            if (requests.get(url + '/blob/main/README.md') != 200):
+              response = requests.get(url + '/blob/master/README.md')
+            else:
+              response = requests.get(url + '/blob/main/README.md')
+            soup = BeautifulSoup(response.text, 'html.parser')
+            readme_content = soup.find('article').get_text() if soup.find('article') else "No README found."
+            text_readme = parser.render(readme_content)
+            return readme_content
+        except (requests.exceptions.ConnectionError, requests.exceptions.HTTPError) as e:
+            return "Unsuccessful request"
+
+    descriptions = [(url, fetch(url)) for url in url_arr]
+
+    for i in range(len(descriptions)):
+        modified_description = descriptions[i][1].replace("\n", " ")
+        modified_tuple = (descriptions[i][0], modified_description)
+        descriptions[i] = modified_tuple
+
+    return descriptions
